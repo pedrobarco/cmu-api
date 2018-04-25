@@ -6,14 +6,12 @@ public class MultipleChoiceQuestion {
 
     private String question;
     private List<String> answers;
-    private Integer answerIndex;
 
     public MultipleChoiceQuestion(){ }
 
-    public MultipleChoiceQuestion(String question, List<String> answers, Integer answerIndex) {
+    public MultipleChoiceQuestion(String question, List<String> answers) {
         this.question = question;
         this.answers = answers;
-        this.answerIndex = answerIndex;
     }
 
     public String getQuestion() {
@@ -32,15 +30,4 @@ public class MultipleChoiceQuestion {
         this.answers = answers;
     }
 
-    public Integer getAnswerIndex() {
-        return answerIndex;
-    }
-
-    public void setAnswerIndex(Integer answerIndex) {
-        this.answerIndex = answerIndex;
-    }
-
-    public String getCorrectAnswer() {
-        return this.answers.get(this.answerIndex);
-    }
 }

@@ -19,11 +19,6 @@ public class MonumentController {
         this.monumentRepository = monumentRepository;
     }
 
-    @GetMapping
-    public Optional<Monument> getBySsid(@RequestParam("ssid") String ssid) {
-        return monumentRepository.findBySsid(ssid);
-    }
-
     @PostMapping
     public Monument create(@RequestBody Monument monument){
         monumentRepository.save(monument);
@@ -47,14 +42,18 @@ public class MonumentController {
         return "All monuments deleted successfully!";
     }
 
-    @GetMapping("/{id}")
-    public Optional<Monument> getById(@PathVariable("id") String id){
-        return monumentRepository.findById(id);
+    @GetMapping("/{ssid}")
+    public Optional<Monument> getById(@PathVariable("ssid") String ssid){
+        Optional<Monument> monument = monumentRepository.findById(ssid);
+        monument.ifPresent(m ->
+            m.getQuiz().setSolution(null)
+        );
+        return monument;
     }
 
-    @DeleteMapping("/{id}")
-    public String deleteById(@PathVariable("id") String id){
-        monumentRepository.deleteById(id);
+    @DeleteMapping("/{ssid}")
+    public String deleteById(@PathVariable("ssid") String ssid){
+        monumentRepository.deleteById(ssid);
         return "Monument deleted successfully!";
     }
 }

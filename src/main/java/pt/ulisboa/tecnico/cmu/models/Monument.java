@@ -4,32 +4,34 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Document(collection = "monuments")
 public class Monument {
 
     @Id
-    private String id;
+    private String ssid;
     private String name;
     private String description;
     private String image;
-    @Indexed(unique = true)
-    private String ssid;
     private Quiz quiz;
 
     public Monument() { }
 
-    public Monument(String name, String ssid, Quiz quiz) {
-        this.name = name;
+    public Monument(String ssid, String name, String description, String image, List<Quiz> quizList) {
         this.ssid = ssid;
+        this.name = name;
+        this.description = description;
+        this.image = image;
         this.quiz = quiz;
     }
 
-    public String getId() {
-        return id;
+    public String getSsid() {
+        return ssid;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setSsid(String ssid) {
+        this.ssid = ssid;
     }
 
     public String getName() {
@@ -54,14 +56,6 @@ public class Monument {
 
     public void setImage(String image) {
         this.image = image;
-    }
-
-    public String getSsid() {
-        return ssid;
-    }
-
-    public void setSsid(String ssid) {
-        this.ssid = ssid;
     }
 
     public Quiz getQuiz() {
