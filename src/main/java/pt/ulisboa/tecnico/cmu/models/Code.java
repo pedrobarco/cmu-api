@@ -33,4 +33,5 @@ public class Code {
     public void setInUse(boolean inUse) {
         this.inUse = inUse;
     }
+
 }

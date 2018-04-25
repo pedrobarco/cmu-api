@@ -11,14 +11,14 @@ public class User {
     @Id
     private String id;
     @Indexed(unique = true)
-    private String userName;
-    private Code code;
+    private String username;
+    private String password;
 
     public User() { }
 
-    public User(String userName, Code code) {
-        this.userName = userName;
-        this.code = code;
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
     }
 
     public String getId() {
@@ -29,19 +29,19 @@ public class User {
         this.id = id;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public Code getCode() {
-        return code;
+    public String getPassword() {
+        return password;
     }
 
-    public void setCode(Code code) {
-        this.code = code;
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

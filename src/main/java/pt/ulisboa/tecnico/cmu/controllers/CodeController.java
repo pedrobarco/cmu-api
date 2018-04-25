@@ -12,8 +12,12 @@ import java.util.Optional;
 @RequestMapping("api/codes")
 public class CodeController {
 
+    private final CodeRepository codeRepository;
+
     @Autowired
-    private CodeRepository codeRepository;
+    public CodeController(CodeRepository codeRepository) {
+        this.codeRepository = codeRepository;
+    }
 
     @PostMapping
     public Code create(@RequestBody Code code){

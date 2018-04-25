@@ -12,8 +12,12 @@ import java.util.Optional;
 @RequestMapping("/api/monuments")
 public class MonumentController {
 
+    private final MonumentRepository monumentRepository;
+
     @Autowired
-    private MonumentRepository monumentRepository;
+    public MonumentController(MonumentRepository monumentRepository) {
+        this.monumentRepository = monumentRepository;
+    }
 
     @GetMapping
     public Optional<Monument> getBySsid(@RequestParam("ssid") String ssid) {

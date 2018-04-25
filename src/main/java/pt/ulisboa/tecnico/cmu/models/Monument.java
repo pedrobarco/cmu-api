@@ -10,6 +10,8 @@ public class Monument {
     @Id
     private String id;
     private String name;
+    private String description;
+    private String image;
     @Indexed(unique = true)
     private String ssid;
     private Quiz quiz;
@@ -38,6 +40,22 @@ public class Monument {
         this.name = name;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
     public String getSsid() {
         return ssid;
     }
@@ -53,4 +71,5 @@ public class Monument {
     public void setQuiz(Quiz quiz) {
         this.quiz = quiz;
     }
+
 }

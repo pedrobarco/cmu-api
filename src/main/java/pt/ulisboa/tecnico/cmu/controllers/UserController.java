@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.cmu.controllers;
 
+import com.mongodb.MongoWriteException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import pt.ulisboa.tecnico.cmu.models.User;
 import pt.ulisboa.tecnico.cmu.repositories.CodeRepository;
 import pt.ulisboa.tecnico.cmu.repositories.UserRepository;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,27 +18,38 @@ import java.util.Optional;
 @RequestMapping("api/users")
 public class UserController {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    private final CodeRepository codeRepository;
 
     @Autowired
-    private CodeRepository codeRepository;
+    public UserController(UserRepository userRepository, CodeRepository codeRepository) {
+        this.userRepository = userRepository;
+        this.codeRepository = codeRepository;
+    }
 
     @PostMapping
     public ResponseEntity create(@RequestBody User user){
-        Optional<Code> code = codeRepository.findById(user.getCode().getSecret());
-        ResponseEntity err = ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        StringBuilder msg = new StringBuilder();
+        ResponseEntity err = ResponseEntity.status(HttpStatus.BAD_REQUEST).body(msg);
         ResponseEntity success = ResponseEntity.ok(user);
-        if (code.isPresent() && !code.get().isInUse()) {
+        ResponseEntity response;
+        Optional<Code> code = codeRepository.findById(user.getPassword());
+        Optional<User> anotherUser = userRepository.findByUsername(user.getUsername());
+        if(anotherUser.isPresent()) {
+            msg.append("Username already exists.");
+            response = err;
+        } else if(code.isPresent() && !code.get().isInUse()) {
             Code c = code.get();
-            c.setInUse(true);
-            user.setCode(c);
-            codeRepository.save(c);
             userRepository.save(user);
-            return success;
+            c.setInUse(true);
+            codeRepository.save(c);
+            response = success;
         } else {
-            return  err;
+            msg.append("Invalid password.");
+            response = err;
         }
+        return response;
     }
 
     @GetMapping("/all")
