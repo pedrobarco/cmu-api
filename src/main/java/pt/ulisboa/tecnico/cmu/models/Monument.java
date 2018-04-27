@@ -10,6 +10,8 @@ import java.util.List;
 public class Monument {
 
     @Id
+    private String id;
+    @Indexed(unique = true)
     private String ssid;
     private String name;
     private String description;
@@ -18,12 +20,20 @@ public class Monument {
 
     public Monument() { }
 
-    public Monument(String ssid, String name, String description, String image, List<Quiz> quizList) {
+    public Monument(String ssid, String name, String description, String image, Quiz quiz) {
         this.ssid = ssid;
         this.name = name;
         this.description = description;
         this.image = image;
         this.quiz = quiz;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getSsid() {
@@ -65,5 +75,4 @@ public class Monument {
     public void setQuiz(Quiz quiz) {
         this.quiz = quiz;
     }
-
 }

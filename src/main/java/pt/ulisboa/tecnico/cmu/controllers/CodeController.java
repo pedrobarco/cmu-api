@@ -21,8 +21,12 @@ public class CodeController {
 
     @PostMapping
     public Code create(@RequestBody Code code){
-        codeRepository.save(code);
-        return code;
+        return codeRepository.save(code);
+    }
+
+    @PutMapping
+    public Code update(@RequestBody Code code){
+        return codeRepository.save(code);
     }
 
     @GetMapping("/all")

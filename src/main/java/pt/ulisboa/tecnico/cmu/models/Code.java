@@ -8,14 +8,24 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Code {
 
     @Id
+    private String id;
+    @Indexed(unique = true)
     private String secret;
-    private boolean inUse;
+    private String userId;
 
     public Code() { }
 
     public Code(String secret) {
         this.secret = secret;
-        this.inUse = false;
+        this.userId = null;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getSecret() {
@@ -26,12 +36,11 @@ public class Code {
         this.secret = secret;
     }
 
-    public boolean isInUse() {
-        return inUse;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setInUse(boolean inUse) {
-        this.inUse = inUse;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
-
 }

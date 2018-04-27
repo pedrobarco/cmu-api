@@ -7,4 +7,8 @@ import java.util.Optional;
 
 public interface CodeRepository extends MongoRepository<Code, String> {
 
+    @Override
+    Optional<Code> findById(String id);
+
+    Optional<Code> findBySecret(String secret);
 }

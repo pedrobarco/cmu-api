@@ -10,5 +10,7 @@ import java.util.Optional;
 public interface MonumentRepository extends MongoRepository<Monument, String> {
 
     @Override
-    Optional<Monument> findById(String ssid);
+    Optional<Monument> findById(String id);
+
+    Optional<Monument> findBySsid(String ssid);
 }

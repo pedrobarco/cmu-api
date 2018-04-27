@@ -34,15 +34,15 @@ public class UserController {
         ResponseEntity err = ResponseEntity.status(HttpStatus.BAD_REQUEST).body(msg);
         ResponseEntity success = ResponseEntity.ok(user);
         ResponseEntity response;
-        Optional<Code> code = codeRepository.findById(user.getPassword());
+        Optional<Code> code = codeRepository.findBySecret(user.getPassword());
         Optional<User> anotherUser = userRepository.findByUsername(user.getUsername());
         if(anotherUser.isPresent()) {
             msg.append("Username already exists.");
             response = err;
-        } else if(code.isPresent() && !code.get().isInUse()) {
+        } else if(code.isPresent() && code.get().getUserId() != null) {
             Code c = code.get();
-            userRepository.save(user);
-            c.setInUse(true);
+            User newUser = userRepository.save(user);
+            c.setUserId(newUser.getId());
             codeRepository.save(c);
             response = success;
         } else {
