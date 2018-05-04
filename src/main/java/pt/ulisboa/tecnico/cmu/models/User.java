@@ -2,8 +2,9 @@ package pt.ulisboa.tecnico.cmu.models;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.UUID;
 
 @Document(collection = "users")
 public class User {
@@ -13,12 +14,16 @@ public class User {
     @Indexed(unique = true)
     private String username;
     private String password;
+    private String sessionId;
+    private int score;
 
     public User() { }
 
     public User(String username, String password) {
         this.username = username;
         this.password = password;
+        this.sessionId = null;
+        this.score = 0;
     }
 
     public String getId() {
@@ -43,5 +48,26 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public String generateSessionId(){
+        String uniqueID = UUID.randomUUID().toString();
+        return uniqueID;
     }
 }

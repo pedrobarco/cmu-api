@@ -1,6 +1,5 @@
 package pt.ulisboa.tecnico.cmu.controllers;
 
-import com.mongodb.MongoWriteException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,9 +9,10 @@ import pt.ulisboa.tecnico.cmu.models.User;
 import pt.ulisboa.tecnico.cmu.repositories.CodeRepository;
 import pt.ulisboa.tecnico.cmu.repositories.UserRepository;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
+
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping("api/users")
@@ -32,14 +32,16 @@ public class UserController {
     public ResponseEntity create(@RequestBody User user){
         StringBuilder msg = new StringBuilder();
         ResponseEntity err = ResponseEntity.status(HttpStatus.BAD_REQUEST).body(msg);
-        ResponseEntity success = ResponseEntity.ok(user);
+        ResponseEntity success = ok(user);
         ResponseEntity response;
+
         Optional<Code> code = codeRepository.findBySecret(user.getPassword());
         Optional<User> anotherUser = userRepository.findByUsername(user.getUsername());
+
         if(anotherUser.isPresent()) {
             msg.append("Username already exists.");
             response = err;
-        } else if(code.isPresent() && code.get().getUserId() != null) {
+        } else if(code.isPresent() && code.get().getUserId() == null) {
             Code c = code.get();
             User newUser = userRepository.save(user);
             c.setUserId(newUser.getId());
@@ -49,7 +51,25 @@ public class UserController {
             msg.append("Invalid password.");
             response = err;
         }
+
         return response;
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity login(@RequestBody User user){
+        Optional<User> actualUser = userRepository.findByUsernameAndPassword(user.getUsername(), user.getPassword());
+
+        if(actualUser.isPresent()){
+            User u = actualUser.get();
+            String sessionId = actualUser.get().generateSessionId();
+            u.setSessionId(sessionId);
+            userRepository.save(u);
+            return ResponseEntity.ok(sessionId);
+        }
+        else {
+            String msg = "Invalid username or password.";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(msg);
+        }
     }
 
     @GetMapping("/all")

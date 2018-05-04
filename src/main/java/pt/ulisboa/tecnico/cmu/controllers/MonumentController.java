@@ -19,7 +19,6 @@ public class MonumentController {
         this.monumentRepository = monumentRepository;
     }
 
-
     @GetMapping
     public Optional<Monument> getBySsid(@RequestParam String ssid){
         Optional<Monument> monument = monumentRepository.findBySsid(ssid);
