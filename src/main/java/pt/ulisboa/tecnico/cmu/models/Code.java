@@ -11,13 +11,11 @@ public class Code {
     private String id;
     @Indexed(unique = true)
     private String secret;
-    private String userId;
 
     public Code() { }
 
     public Code(String secret) {
         this.secret = secret;
-        this.userId = null;
     }
 
     public String getId() {
@@ -34,13 +32,5 @@ public class Code {
 
     public void setSecret(String secret) {
         this.secret = secret;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 }

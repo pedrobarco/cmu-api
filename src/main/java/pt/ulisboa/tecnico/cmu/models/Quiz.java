@@ -1,8 +1,12 @@
 package pt.ulisboa.tecnico.cmu.models;
 
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.List;
 
+@Document(collection = "quizzes")
 public class Quiz {
 
     private List<MultipleChoiceQuestion> multipleChoiceQuestionList;
@@ -10,8 +14,9 @@ public class Quiz {
 
     public Quiz(){ }
 
-    public Quiz(List<MultipleChoiceQuestion> multipleChoiceQuestionList) {
+    public Quiz(List<MultipleChoiceQuestion> multipleChoiceQuestionList, List<Integer> solution) {
         this.multipleChoiceQuestionList = multipleChoiceQuestionList;
+        this.solution = solution;
     }
 
     public List<MultipleChoiceQuestion> getMultipleChoiceQuestionList() {

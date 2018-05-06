@@ -13,15 +13,15 @@ public class User {
     private String id;
     @Indexed(unique = true)
     private String username;
-    private String password;
+    private Code code;
     private String sessionId;
     private int score;
 
     public User() { }
 
-    public User(String username, String password) {
+    public User(String username, Code code) {
         this.username = username;
-        this.password = password;
+        this.code = code;
         this.sessionId = null;
         this.score = 0;
     }
@@ -42,12 +42,12 @@ public class User {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
+    public Code getCode() {
+        return code;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setCode(Code code) {
+        this.code = code;
     }
 
     public String getSessionId() {
@@ -67,7 +67,6 @@ public class User {
     }
 
     public String generateSessionId(){
-        String uniqueID = UUID.randomUUID().toString();
-        return uniqueID;
+        return UUID.randomUUID().toString();
     }
 }

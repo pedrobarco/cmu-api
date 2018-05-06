@@ -35,17 +35,16 @@ public class UserController {
         ResponseEntity success = ok(user);
         ResponseEntity response;
 
-        Optional<Code> code = codeRepository.findBySecret(user.getPassword());
-        Optional<User> anotherUser = userRepository.findByUsername(user.getUsername());
+        Optional<Code> code = codeRepository.findBySecret(user.getCode().getSecret());
+        Optional<User> userUsingSameUsername = userRepository.findByUsername(user.getUsername());
+        Optional<User> userUsingSameCode = userRepository.findByCode(user.getCode());
 
-        if(anotherUser.isPresent()) {
+        if(userUsingSameUsername.isPresent()) {
             msg.append("Username already exists.");
             response = err;
-        } else if(code.isPresent() && code.get().getUserId() == null) {
-            Code c = code.get();
-            User newUser = userRepository.save(user);
-            c.setUserId(newUser.getId());
-            codeRepository.save(c);
+        } else if(code.isPresent() && !userUsingSameCode.isPresent()) {
+            user.setCode(code.get());
+            userRepository.save(user);
             response = success;
         } else {
             msg.append("Invalid password.");
@@ -57,7 +56,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody User user){
-        Optional<User> actualUser = userRepository.findByUsernameAndPassword(user.getUsername(), user.getPassword());
+        Optional<User> actualUser = userRepository.findByUsernameAndAndCode(user.getUsername(), user.getCode());
 
         if(actualUser.isPresent()){
             User u = actualUser.get();
@@ -65,8 +64,7 @@ public class UserController {
             u.setSessionId(sessionId);
             userRepository.save(u);
             return ResponseEntity.ok(sessionId);
-        }
-        else {
+        } else {
             String msg = "Invalid username or password.";
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(msg);
         }
@@ -93,4 +91,5 @@ public class UserController {
         userRepository.deleteById(id);
         return "User deleted successfully!";
     }
+
 }
