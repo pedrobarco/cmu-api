@@ -4,6 +4,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.UUID;
 
 @Document(collection = "users")
@@ -15,7 +17,8 @@ public class User {
     private String username;
     private Code code;
     private String sessionId;
-    private int score;
+    private int totalScore;
+    private HashMap<String, QuizAnswers> scores = new HashMap<>();
 
     public User() { }
 
@@ -23,7 +26,7 @@ public class User {
         this.username = username;
         this.code = code;
         this.sessionId = null;
-        this.score = 0;
+        this.totalScore = 0;
     }
 
     public String getId() {
@@ -58,15 +61,35 @@ public class User {
         this.sessionId = sessionId;
     }
 
-    public int getScore() {
-        return score;
+    public int getTotalScore() {
+        return totalScore;
     }
 
-    public void setScore(int score) {
-        this.score = score;
+    public void setTotalScore(int totalScore) {
+        this.totalScore = totalScore;
+    }
+
+    public HashMap<String, QuizAnswers> getScores() {
+        return scores;
+    }
+
+    public void setScores(HashMap<String, QuizAnswers> scores) {
+        this.scores = scores;
     }
 
     public String generateSessionId(){
         return UUID.randomUUID().toString();
     }
+
+    public void calcTotalScore(){
+        Collection<QuizAnswers> quizAnswers = this.scores.values();
+        int totalScore = 0;
+
+        for (QuizAnswers qA : quizAnswers) {
+           totalScore+= qA.getScore();
+        }
+
+        this.totalScore = totalScore;
+    }
+
 }

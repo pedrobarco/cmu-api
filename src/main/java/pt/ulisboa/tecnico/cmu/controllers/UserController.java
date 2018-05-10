@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.ulisboa.tecnico.cmu.models.Code;
 import pt.ulisboa.tecnico.cmu.models.Monument;
+import pt.ulisboa.tecnico.cmu.models.QuizAnswers;
 import pt.ulisboa.tecnico.cmu.models.User;
 import pt.ulisboa.tecnico.cmu.repositories.CodeRepository;
 import pt.ulisboa.tecnico.cmu.repositories.MonumentRepository;
@@ -97,22 +98,25 @@ public class UserController {
         return "User deleted successfully!";
     }
 
-    @PostMapping("/{sessionId}/{monumentId}")
-    public Optional<User> submitQuiz(@PathVariable("sessionId") String sessionId, @PathVariable("monumentId") String monumentId, @RequestBody List<Integer> answers){
-        Optional<User> user = userRepository.findBySessionId(sessionId);
-        Optional<Monument> monument = monumentRepository.findById(monumentId);
-        if(user.isPresent() && monument.isPresent()) {
-            List<Integer> solution = monument.get().getQuiz().getSolution();
+    @PostMapping("/{id}/quiz")
+    public Optional<User> submitQuiz(@PathVariable("id") String id, @RequestBody List<QuizAnswers> quizAnswersList){
+        Optional<User> user = userRepository.findById(id);
 
-            int score = 0;
-            int maxSize = (solution.size() >= answers.size()) ? solution.size() : answers.size();
-            for (int i = 0; i < maxSize; i++){
-                if(solution.get(i).equals(answers.get(i))){
-                    score++;
+        if(user.isPresent()){
+            for (QuizAnswers qA : quizAnswersList){
+                Optional<Monument> monument = monumentRepository.findById(qA.getMonumentId());
+
+                if(monument.isPresent()) {
+                    List<Integer> solution = monument.get().getQuiz().getSolution();
+
+                    qA.setSolution(solution);
+                    qA.calcScore();
+
+                    user.get().getScores().put(monument.get().getId(), qA);
                 }
             }
 
-            user.get().setScore(user.get().getScore() + score);
+            user.get().calcTotalScore();
             userRepository.save(user.get());
 
             return user;
