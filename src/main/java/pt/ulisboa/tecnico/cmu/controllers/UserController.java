@@ -5,8 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pt.ulisboa.tecnico.cmu.models.Code;
+import pt.ulisboa.tecnico.cmu.models.Monument;
 import pt.ulisboa.tecnico.cmu.models.User;
 import pt.ulisboa.tecnico.cmu.repositories.CodeRepository;
+import pt.ulisboa.tecnico.cmu.repositories.MonumentRepository;
 import pt.ulisboa.tecnico.cmu.repositories.UserRepository;
 
 import java.util.List;
@@ -22,10 +24,13 @@ public class UserController {
 
     private final CodeRepository codeRepository;
 
+    private final MonumentRepository monumentRepository;
+
     @Autowired
-    public UserController(UserRepository userRepository, CodeRepository codeRepository) {
+    public UserController(UserRepository userRepository, CodeRepository codeRepository, MonumentRepository monumentRepository) {
         this.userRepository = userRepository;
         this.codeRepository = codeRepository;
+        this.monumentRepository = monumentRepository;
     }
 
     @PostMapping
@@ -90,6 +95,30 @@ public class UserController {
     public String deleteById(@PathVariable("id") String id){
         userRepository.deleteById(id);
         return "User deleted successfully!";
+    }
+
+    @PostMapping("/{sessionId}/{monumentId}")
+    public Optional<User> submitQuiz(@PathVariable("sessionId") String sessionId, @PathVariable("monumentId") String monumentId, @RequestBody List<Integer> answers){
+        Optional<User> user = userRepository.findBySessionId(sessionId);
+        Optional<Monument> monument = monumentRepository.findById(monumentId);
+        if(user.isPresent() && monument.isPresent()) {
+            List<Integer> solution = monument.get().getQuiz().getSolution();
+
+            int score = 0;
+            int maxSize = (solution.size() >= answers.size()) ? solution.size() : answers.size();
+            for (int i = 0; i < maxSize; i++){
+                if(solution.get(i).equals(answers.get(i))){
+                    score++;
+                }
+            }
+
+            user.get().setScore(user.get().getScore() + score);
+            userRepository.save(user.get());
+
+            return user;
+        } else {
+            return Optional.empty();
+        }
     }
 
 }
