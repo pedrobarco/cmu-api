@@ -16,5 +16,5 @@ public interface UserRepository extends MongoRepository<User, String> {
 
     Optional<User> findByCode(Code code);
 
-    Optional<User> findByUsernameAndAndCode(String username, Code code);
+    Optional<User> findByUsernameAndCode(String username, String secret);
 }

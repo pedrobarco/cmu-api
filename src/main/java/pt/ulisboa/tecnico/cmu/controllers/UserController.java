@@ -62,14 +62,14 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody User user){
-        Optional<User> actualUser = userRepository.findByUsernameAndAndCode(user.getUsername(), user.getCode());
+        Optional<User> actualUser = userRepository.findByUsername(user.getUsername());
 
-        if(actualUser.isPresent()){
+        if(actualUser.isPresent() && actualUser.get().getCode().getSecret().equals(user.getCode().getSecret())){
             User u = actualUser.get();
             String sessionId = actualUser.get().generateSessionId();
             u.setSessionId(sessionId);
             userRepository.save(u);
-            return ResponseEntity.ok(sessionId);
+            return ok(u);
         } else {
             String msg = "Invalid username or password.";
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(msg);
