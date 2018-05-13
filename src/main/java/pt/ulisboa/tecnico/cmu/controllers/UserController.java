@@ -1,6 +1,7 @@
 package pt.ulisboa.tecnico.cmu.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import pt.ulisboa.tecnico.cmu.repositories.CodeRepository;
 import pt.ulisboa.tecnico.cmu.repositories.MonumentRepository;
 import pt.ulisboa.tecnico.cmu.repositories.UserRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,6 +81,11 @@ public class UserController {
     @GetMapping("/all")
     public List<User> getAll() {
         return userRepository.findAll();
+    }
+
+    @GetMapping("/all/scores")
+    public List<User> getAllScores() {
+        return userRepository.findAllByOrderByScoresDesc();
     }
 
     @DeleteMapping("/all")

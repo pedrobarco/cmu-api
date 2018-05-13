@@ -4,7 +4,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import pt.ulisboa.tecnico.cmu.models.Code;
 import pt.ulisboa.tecnico.cmu.models.User;
 
-import javax.swing.text.html.Option;
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends MongoRepository<User, String> {
@@ -15,4 +15,6 @@ public interface UserRepository extends MongoRepository<User, String> {
     Optional<User> findByUsername(String username);
 
     Optional<User> findByCode(Code code);
+
+    List<User> findAllByOrderByScoresDesc();
 }
