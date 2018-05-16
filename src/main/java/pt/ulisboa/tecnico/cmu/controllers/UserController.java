@@ -13,7 +13,6 @@ import pt.ulisboa.tecnico.cmu.repositories.CodeRepository;
 import pt.ulisboa.tecnico.cmu.repositories.MonumentRepository;
 import pt.ulisboa.tecnico.cmu.repositories.UserRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 

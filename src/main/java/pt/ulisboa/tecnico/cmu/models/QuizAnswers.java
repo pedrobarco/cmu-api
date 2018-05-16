@@ -6,14 +6,16 @@ public class QuizAnswers {
 
     private String monumentId;
     private List<Integer> answers;
+    private Long time;
     private List<Integer> solution;
     private Integer score;
 
     public QuizAnswers(){}
 
-    public QuizAnswers(String monumentId, List<Integer> answers) {
+    public QuizAnswers(String monumentId, List<Integer> answers, Long time) {
         this.monumentId = monumentId;
         this.answers = answers;
+        this.time = time;
         this.solution = null;
         this.score = 0;
     }
@@ -32,6 +34,14 @@ public class QuizAnswers {
 
     public void setAnswers(List<Integer> answers) {
         this.answers = answers;
+    }
+
+    public Long getTime() {
+        return time;
+    }
+
+    public void setTime(Long time) {
+        this.time = time;
     }
 
     public List<Integer> getSolution() {
@@ -60,6 +70,9 @@ public class QuizAnswers {
             }
         }
 
-        this.score = score;
+        int extra = (int) (this.time / (60 * 1000));
+
+        this.score = score + extra;
     }
+
 }
