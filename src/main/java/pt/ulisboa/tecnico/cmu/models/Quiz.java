@@ -11,12 +11,14 @@ public class Quiz {
 
     private List<MultipleChoiceQuestion> multipleChoiceQuestionList;
     private List<Integer> solution;
+    private Long duration;
 
     public Quiz(){ }
 
-    public Quiz(List<MultipleChoiceQuestion> multipleChoiceQuestionList, List<Integer> solution) {
+    public Quiz(List<MultipleChoiceQuestion> multipleChoiceQuestionList, List<Integer> solution, Long duration) {
         this.multipleChoiceQuestionList = multipleChoiceQuestionList;
         this.solution = solution;
+        this.duration = duration;
     }
 
     public List<MultipleChoiceQuestion> getMultipleChoiceQuestionList() {
@@ -34,4 +36,13 @@ public class Quiz {
     public void setSolution(List<Integer> solution) {
         this.solution = solution;
     }
+
+    public Long getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Long duration) {
+        this.duration = duration;
+    }
+
 }

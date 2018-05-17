@@ -13,6 +13,7 @@ import pt.ulisboa.tecnico.cmu.repositories.CodeRepository;
 import pt.ulisboa.tecnico.cmu.repositories.MonumentRepository;
 import pt.ulisboa.tecnico.cmu.repositories.UserRepository;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -104,6 +105,19 @@ public class UserController {
         return "User deleted successfully!";
     }
 
+    @GetMapping("/{id}/quiz")
+    public Optional<Monument> startQuiz(@PathVariable("id") String id, @RequestParam("ssid") String ssid){
+        Optional<User> user = userRepository.findById(id);
+
+        user.ifPresent(u -> {
+            Long timestamp = System.currentTimeMillis();
+            u.setTimestamp(timestamp);
+            userRepository.save(u);
+        });
+
+        return monumentRepository.findBySsid(ssid);
+    }
+
     @PostMapping("/{id}/quiz")
     public Optional<User> submitQuiz(@PathVariable("id") String id, @RequestBody List<QuizAnswers> quizAnswersList){
         Optional<User> user = userRepository.findById(id);
@@ -115,6 +129,11 @@ public class UserController {
                 if(monument.isPresent()) {
                     List<Integer> solution = monument.get().getQuiz().getSolution();
 
+                    Long userTime = System.currentTimeMillis() - user.get().getTimestamp();
+                    Long duration = monument.get().getQuiz().getDuration();
+                    Long time = Math.max(0, duration - userTime);
+
+                    qA.setTime(time);
                     qA.setSolution(solution);
                     qA.calcScore();
 

@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.UUID;
@@ -19,6 +20,7 @@ public class User {
     private String sessionId;
     private int totalScore;
     private HashMap<String, QuizAnswers> scores = new HashMap<>();
+    private Long timestamp;
 
     public User() { }
 
@@ -27,6 +29,7 @@ public class User {
         this.code = code;
         this.sessionId = null;
         this.totalScore = 0;
+        this.timestamp = null;
     }
 
     public String getId() {
@@ -81,12 +84,20 @@ public class User {
         return UUID.randomUUID().toString();
     }
 
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
+
     public void calcTotalScore(){
         Collection<QuizAnswers> quizAnswers = this.scores.values();
         int totalScore = 0;
 
         for (QuizAnswers qA : quizAnswers) {
-           totalScore+= qA.getScore();
+           totalScore += qA.getScore();
         }
 
         this.totalScore = totalScore;

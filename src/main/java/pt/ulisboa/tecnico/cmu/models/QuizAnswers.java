@@ -6,16 +6,15 @@ public class QuizAnswers {
 
     private String monumentId;
     private List<Integer> answers;
-    private Long time;
     private List<Integer> solution;
     private Integer score;
+    private Long time;
 
     public QuizAnswers(){}
 
-    public QuizAnswers(String monumentId, List<Integer> answers, Long time) {
+    public QuizAnswers(String monumentId, List<Integer> answers) {
         this.monumentId = monumentId;
         this.answers = answers;
-        this.time = time;
         this.solution = null;
         this.score = 0;
     }
