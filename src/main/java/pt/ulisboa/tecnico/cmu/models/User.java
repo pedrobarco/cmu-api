@@ -20,7 +20,7 @@ public class User {
     private String sessionId;
     private int totalScore;
     private HashMap<String, QuizAnswers> scores = new HashMap<>();
-    private Long timestamp;
+    private HashMap<String, Long> timestamps = new HashMap<>();
 
     public User() { }
 
@@ -29,7 +29,6 @@ public class User {
         this.code = code;
         this.sessionId = null;
         this.totalScore = 0;
-        this.timestamp = null;
     }
 
     public String getId() {
@@ -84,12 +83,12 @@ public class User {
         return UUID.randomUUID().toString();
     }
 
-    public Long getTimestamp() {
-        return timestamp;
+    public HashMap<String, Long> getTimestamps() {
+        return timestamps;
     }
 
-    public void setTimestamp(Long timestamp) {
-        this.timestamp = timestamp;
+    public void setTimestamps(HashMap<String, Long> timestamps) {
+        this.timestamps = timestamps;
     }
 
     public void calcTotalScore(){

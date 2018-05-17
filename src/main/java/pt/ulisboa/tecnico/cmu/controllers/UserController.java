@@ -1,7 +1,6 @@
 package pt.ulisboa.tecnico.cmu.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +12,6 @@ import pt.ulisboa.tecnico.cmu.repositories.CodeRepository;
 import pt.ulisboa.tecnico.cmu.repositories.MonumentRepository;
 import pt.ulisboa.tecnico.cmu.repositories.UserRepository;
 
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -108,46 +106,45 @@ public class UserController {
     @GetMapping("/{id}/quiz")
     public Optional<Monument> startQuiz(@PathVariable("id") String id, @RequestParam("ssid") String ssid){
         Optional<User> user = userRepository.findById(id);
+        Optional<Monument> monument = monumentRepository.findBySsid(ssid);
 
-        user.ifPresent(u -> {
+        monument.ifPresent(m -> user.ifPresent(u -> {
             Long timestamp = System.currentTimeMillis();
-            u.setTimestamp(timestamp);
+            u.getTimestamps().putIfAbsent(m.getId(), timestamp);
             userRepository.save(u);
-        });
+        }));
 
-        return monumentRepository.findBySsid(ssid);
+        return monument;
     }
 
     @PostMapping("/{id}/quiz")
-    public Optional<User> submitQuiz(@PathVariable("id") String id, @RequestBody List<QuizAnswers> quizAnswersList){
+    public List<User> submitQuiz(@PathVariable("id") String id, @RequestBody List<QuizAnswers> quizAnswersList){
         Optional<User> user = userRepository.findById(id);
 
-        if(user.isPresent()){
-            for (QuizAnswers qA : quizAnswersList){
+        user.ifPresent(u -> {
+            quizAnswersList.forEach(qA -> {
                 Optional<Monument> monument = monumentRepository.findById(qA.getMonumentId());
 
-                if(monument.isPresent()) {
-                    List<Integer> solution = monument.get().getQuiz().getSolution();
+                monument.ifPresent(m -> {
+                    List<Integer> solution = m.getQuiz().getSolution();
 
-                    Long userTime = System.currentTimeMillis() - user.get().getTimestamp();
-                    Long duration = monument.get().getQuiz().getDuration();
+                    Long userTime = System.currentTimeMillis() - u.getTimestamps().get(qA.getMonumentId());
+                    Long duration = m.getQuiz().getDuration();
                     Long time = Math.max(0, duration - userTime);
 
                     qA.setTime(time);
                     qA.setSolution(solution);
                     qA.calcScore();
 
-                    user.get().getScores().put(monument.get().getId(), qA);
-                }
-            }
+                    u.getScores().put(m.getId(), qA);
+                });
+            });
 
-            user.get().calcTotalScore();
-            userRepository.save(user.get());
+            u.calcTotalScore();
+            userRepository.save(u);
+        });
 
-            return user;
-        } else {
-            return Optional.empty();
-        }
+        return userRepository.findAllByOrderByScoresDesc();
     }
 
 }
