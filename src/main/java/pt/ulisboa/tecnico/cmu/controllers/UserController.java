@@ -105,52 +105,62 @@ public class UserController {
     }
 
     @GetMapping("/{id}/quiz")
-    public ResponseEntity startQuiz(@PathVariable("id") String id, @RequestParam("ssid") String ssid){
+    public ResponseEntity startQuiz(@PathVariable("id") String id, @RequestParam("ssid") String ssid, @RequestParam("sessionId") String sessionId){
         Optional<User> user = userRepository.findById(id);
         Optional<Monument> monument = monumentRepository.findBySsid(ssid);
 
-        if(user.isPresent() && monument.isPresent() && !user.get().getScores().containsKey(monument.get().getId())){
-            Long timestamp = System.currentTimeMillis();
-            user.get().getTimestamps().putIfAbsent(monument.get().getId(), timestamp);
-            userRepository.save(user.get());
-            return ok(monument);
-        } else if(user.isPresent() && monument.isPresent()) {
-            String msg = "Duplicated quiz request.";
-            return status(HttpStatus.CONFLICT).body(msg);
+        if(user.isPresent() && user.get().getSessionId().equals(sessionId)){
+            if(monument.isPresent() && !user.get().getScores().containsKey(monument.get().getId())){
+                Long timestamp = System.currentTimeMillis();
+                user.get().getTimestamps().putIfAbsent(monument.get().getId(), timestamp);
+                userRepository.save(user.get());
+                return ok(monument);
+            } else if(monument.isPresent()) {
+                String msg = "Duplicated quiz request.";
+                return status(HttpStatus.CONFLICT).body(msg);
+            } else {
+                String msg = "Invalid quiz request.";
+                return status(HttpStatus.BAD_REQUEST).body(msg);
+            }
         } else {
-            String msg = "Invalid quiz request.";
+            String msg = "No permission.";
             return status(HttpStatus.BAD_REQUEST).body(msg);
         }
     }
 
     @PostMapping("/{id}/quiz")
-    public List<User> submitQuiz(@PathVariable("id") String id, @RequestBody List<QuizAnswers> quizAnswersList){
+    public ResponseEntity submitQuiz(@PathVariable("id") String id, @RequestParam("sessionId") String sessionId, @RequestBody List<QuizAnswers> quizAnswersList){
         Optional<User> user = userRepository.findById(id);
 
-        user.ifPresent(u -> {
-            quizAnswersList.forEach(qA -> {
-                Optional<Monument> monument = monumentRepository.findById(qA.getMonumentId());
+        if(user.isPresent() && user.get().getSessionId().equals(sessionId)) {
+            user.ifPresent(u -> {
+                quizAnswersList.forEach(qA -> {
+                    Optional<Monument> monument = monumentRepository.findById(qA.getMonumentId());
 
-                monument.ifPresent(m -> {
-                    List<Integer> solution = m.getQuiz().getSolution();
+                    monument.ifPresent(m -> {
+                        List<Integer> solution = m.getQuiz().getSolution();
 
-                    Long userTime = System.currentTimeMillis() - u.getTimestamps().get(qA.getMonumentId());
-                    Long duration = m.getQuiz().getDuration();
-                    Long time = Math.max(0, duration - userTime);
+                        Long userTime = System.currentTimeMillis() - u.getTimestamps().get(qA.getMonumentId());
+                        Long duration = m.getQuiz().getDuration();
+                        Long time = Math.max(0, duration - userTime);
 
-                    qA.setTime(time);
-                    qA.setSolution(solution);
-                    qA.calcScore();
+                        qA.setTime(time);
+                        qA.setSolution(solution);
+                        qA.calcScore();
 
-                    u.getScores().put(m.getId(), qA);
+                        u.getScores().put(m.getId(), qA);
+                    });
                 });
+
+                u.calcTotalScore();
+                userRepository.save(u);
             });
 
-            u.calcTotalScore();
-            userRepository.save(u);
-        });
+            return ok(userRepository.findAllByOrderByTotalScoreDesc());
+        }
 
-        return userRepository.findAllByOrderByTotalScoreDesc();
+        String msg = "No permission.";
+        return status(HttpStatus.BAD_REQUEST).body(msg);
     }
 
 }
