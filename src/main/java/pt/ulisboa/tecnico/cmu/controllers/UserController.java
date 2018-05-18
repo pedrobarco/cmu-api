@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @RequestMapping("api/users")
@@ -37,7 +38,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity create(@RequestBody User user){
         StringBuilder msg = new StringBuilder();
-        ResponseEntity err = ResponseEntity.status(HttpStatus.BAD_REQUEST).body(msg);
+        ResponseEntity err = status(HttpStatus.BAD_REQUEST).body(msg);
         ResponseEntity success = ok(user);
         ResponseEntity response;
 
@@ -72,7 +73,7 @@ public class UserController {
             return ok(u);
         } else {
             String msg = "Invalid username or password.";
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(msg);
+            return status(HttpStatus.BAD_REQUEST).body(msg);
         }
     }
 
@@ -83,7 +84,7 @@ public class UserController {
 
     @GetMapping("/all/scores")
     public List<User> getAllScores() {
-        return userRepository.findAllByOrderByScoresDesc();
+        return userRepository.findAllByOrderByTotalScoreDesc();
     }
 
     @DeleteMapping("/all")
@@ -104,17 +105,22 @@ public class UserController {
     }
 
     @GetMapping("/{id}/quiz")
-    public Optional<Monument> startQuiz(@PathVariable("id") String id, @RequestParam("ssid") String ssid){
+    public ResponseEntity startQuiz(@PathVariable("id") String id, @RequestParam("ssid") String ssid){
         Optional<User> user = userRepository.findById(id);
         Optional<Monument> monument = monumentRepository.findBySsid(ssid);
 
-        monument.ifPresent(m -> user.ifPresent(u -> {
+        if(user.isPresent() && monument.isPresent() && !user.get().getScores().containsKey(monument.get().getId())){
             Long timestamp = System.currentTimeMillis();
-            u.getTimestamps().putIfAbsent(m.getId(), timestamp);
-            userRepository.save(u);
-        }));
-
-        return monument;
+            user.get().getTimestamps().putIfAbsent(monument.get().getId(), timestamp);
+            userRepository.save(user.get());
+            return ok(monument);
+        } else if(user.isPresent() && monument.isPresent()) {
+            String msg = "Duplicated quiz request.";
+            return status(HttpStatus.CONFLICT).body(msg);
+        } else {
+            String msg = "Invalid quiz request.";
+            return status(HttpStatus.BAD_REQUEST).body(msg);
+        }
     }
 
     @PostMapping("/{id}/quiz")
@@ -144,7 +150,7 @@ public class UserController {
             userRepository.save(u);
         });
 
-        return userRepository.findAllByOrderByScoresDesc();
+        return userRepository.findAllByOrderByTotalScoreDesc();
     }
 
 }

@@ -71,7 +71,7 @@ public class QuizAnswers {
 
         int extra = (int) (this.time / (60 * 1000));
 
-        this.score = score + extra;
+        this.score = score * extra;
     }
 
 }

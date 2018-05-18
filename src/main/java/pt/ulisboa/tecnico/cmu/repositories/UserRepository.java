@@ -16,5 +16,5 @@ public interface UserRepository extends MongoRepository<User, String> {
 
     Optional<User> findByCode(Code code);
 
-    List<User> findAllByOrderByScoresDesc();
+    List<User> findAllByOrderByTotalScoreDesc();
 }
